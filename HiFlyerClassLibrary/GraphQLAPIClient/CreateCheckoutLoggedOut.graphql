@@ -1,0 +1,12 @@
+﻿mutation CreateCheckoutLoggedOut($lineItems: [CheckoutLineItemInput!]) {
+  checkoutCreate(input: {lineItems: $lineItems}) {
+    checkout {
+      id
+      webUrl
+    }
+    checkoutUserErrors {
+      field
+      message
+    }
+  }
+}

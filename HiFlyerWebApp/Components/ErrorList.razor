@@ -1,0 +1,66 @@
+﻿@inject IJSRuntime JS
+@inject ErrorListStore _errorListStore
+@inherits LayoutComponentBase
+@implements IDisposable
+
+<div class="error-list" @ref="errorList">
+    <div id="blazor-error-ui" class="hidden @GetStateClass(ErrorState.Info)">
+        An unhandled error has occurred.
+        <a class="dismiss blazor-error-ui__close"@onclick="async () => await CloseError(-1)">🗙</a>
+    </div> 
+    @foreach(var error in errors)
+    {
+        <div class="blazor-error-ui @GetStateClass(error.State)">
+            @error.Message
+            <a class="blazor-error-ui__close" @onclick="async () => await CloseError(errors.IndexOf(error))">🗙</a>
+        </div> 
+    }
+</div>
+
+@code {
+    ElementReference errorList;
+    List<ErrorModel> errors;
+
+    protected override async Task OnInitializedAsync()
+    {
+        errors = _errorListStore.GetState().Errors;
+        _errorListStore.AddStateChangeListeners(() =>
+        {
+            errors = _errorListStore.GetState().Errors;
+            UpdateView();
+        });
+    }
+
+    private async Task CloseError(int errorTargetIndex)
+    {
+        await JS.InvokeAsync<string>("closeError", errorList, errorTargetIndex);
+        if (errorTargetIndex > 0)
+            errors.RemoveAt(errorTargetIndex);
+    }
+
+    private string GetStateClass(ErrorState errorState)
+    {
+        switch (errorState)
+        {
+            case ErrorState.Info:
+                return "error-list__info";
+            case ErrorState.Warning:
+                return "error-list__warning";
+            case ErrorState.Danger:
+                return "error-list__danger";
+            default:
+                return null;
+        }
+
+    }
+
+    public void UpdateView()
+        {
+            StateHasChanged();
+        }
+
+    public void Dispose()
+    {
+        _errorListStore.RemoveStateChangeListeners(UpdateView);
+    }
+}

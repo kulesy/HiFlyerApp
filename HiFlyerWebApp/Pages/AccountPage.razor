@@ -1,0 +1,262 @@
+﻿@page "/account"
+@inject ITokenCache _tokenCache
+@inject IShopifyEndpoint _shopifyEndpoint
+@inject ErrorListStore _errorListStore
+
+@if (customer is not null)
+{
+    <div class="account">
+        <ItemComponent Item="customer" @ref="customerItem">
+            <Row Context="customer">
+                <div class="account__body">
+                    <div class="account__body__heading">
+                        <h1 class="account__body__heading__text">Account</h1>
+                        <div class="account__body__heading__manage" @onclick="OpenEditAccount">
+                            <ion-icon name="pencil-outline"></ion-icon>
+                        </div>
+                    </div>
+                    <div class="account__body__info">
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">First Name</h2>
+                            <h3 class="account__body__info__tab__text">@customer.FirstName</h3>
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Last Name</h2>
+                            <h3 class="account__body__info__tab__text">@customer.LastName</h3>
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Email</h2>
+                            <h3 class="account__body__info__tab__text">@customer.Email</h3>
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Phone</h2>
+                            <h3 class="account__body__info__tab__text">@customer.Phone</h3>
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Suscribed to HiflyEmails</h2>
+                            <h3 class="account__body__info__tab__text">@customer.AcceptsMarketing</h3>
+                        </div>
+                    </div>
+                </div>
+            
+            </Row>
+            <EditTemplate Context="reservation">
+                <div class="account__body">
+                    <div class="account__body__heading">
+                        <h1 class="account__body__heading__text">Account</h1>
+                        <div class="account__body__heading__manage" @onclick="EditAccount">
+                            <ion-icon name="checkmark-outline"></ion-icon>
+                        </div>
+                    </div>
+                    <div class="account__body__info">
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">First Name</h2>
+                            <input type="text" class="form-control" @bind-value="customer.FirstName" />
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Last Name</h2>
+                            <input type="text" class="form-control" @bind-value="customer.LastName" />
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Email</h2>
+                            <input type="text" class="form-control" @bind-value="customer.Email" />
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Phone</h2>
+                            <input type="text" class="form-control" @bind-value="customer.Phone" />
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Suscribed to HiflyEmails</h2>
+                            <CheckBoxInput boolIsChecked="customer.AcceptsMarketing" boolIsCheckedChanged="e => customer.AcceptsMarketing = e" />
+                        </div>
+                    </div>
+                </div>
+            </EditTemplate>
+        </ItemComponent>
+        <ItemComponent Item="customer.DefaultAddress" @ref="addressItem">
+            <Row Context="address">
+                <div class="account__body">
+                    <div class="account__body__heading">
+                        <h1 class="account__body__heading__text">Address</h1>
+                        <div class="account__body__heading__manage" @onclick="OpenEditAddress">
+                            <ion-icon name="pencil-outline"></ion-icon>
+                        </div>
+                    </div>
+                    <div class="account__body__info">
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Address 1</h2>
+                            <h3 class="account__body__info__tab__text">@address.Address1</h3>
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Address 2</h2>
+                            <h3 class="account__body__info__tab__text">@address.Address2</h3>
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">City</h2>
+                            <h3 class="account__body__info__tab__text">@address.City</h3>
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Company</h2>
+                            <h3 class="account__body__info__tab__text">@address.Company</h3>
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Country</h2>
+                            <h3 class="account__body__info__tab__text">@address.Country</h3>
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">First Name</h2>
+                            <h3 class="account__body__info__tab__text">@address.FirstName</h3>
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Last Name</h2>
+                            <h3 class="account__body__info__tab__text">@address.LastName</h3>
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Phone</h2>
+                            <h3 class="account__body__info__tab__text">@address.Phone</h3>
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Province</h2>
+                            <h3 class="account__body__info__tab__text">@address.Province</h3>
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Zip</h2>
+                            <h3 class="account__body__info__tab__text">@address.Zip</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="account__edit">
+                        <ion-icon name="edit-outline"></ion-icon>
+                </div>
+            </Row>
+            <EditTemplate Context="reservation">
+                <div class="account__body">
+                    <div class="account__body__heading">
+                        <h1 class="account__body__heading__text">Address</h1>
+                        <div class="account__body__heading__manage" @onclick="EditAddress">
+                            <ion-icon name="checkmark-outline"></ion-icon>
+                        </div>
+                    </div>
+                    <div class="account__body__info">
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Address 1</h2>
+                            <input type="text" class="form-control" @bind-value="reservation.Address1" />
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Address 2</h2>
+                            <input type="text" class="form-control" @bind-value="reservation.Address2" />
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">City</h2>
+                            <input type="text" class="form-control" @bind-value="reservation.City" />
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Company</h2>
+                            <input type="text" class="form-control" @bind-value="reservation.Company" />
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Country</h2>
+                            <input type="text" class="form-control" @bind-value="reservation.Country" />
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">First Name</h2>
+                            <input type="text" class="form-control" @bind-value="reservation.FirstName" />
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Last Name</h2>
+                            <input type="text" class="form-control" @bind-value="reservation.LastName" />
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Phone</h2>
+                            <input type="text" class="form-control" @bind-value="reservation.Phone" />
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Province</h2>
+                            <input type="text" class="form-control" @bind-value="reservation.Province" />
+                        </div>
+                        <div class="account__body__info__tab">
+                            <h2 class="account__body__info__tab__heading">Zip</h2>
+                            <input type="text" class="form-control" @bind-value="reservation.Zip" />
+                        </div>
+                    </div>
+                </div>
+            </EditTemplate>
+        </ItemComponent>
+    </div>
+}
+
+else if (customer is null)
+{
+    <div class="spinner">
+        <div class="spinner-border text-dark" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+
+@code {
+    Customer customer;
+    private ItemComponent<Customer> customerItem;
+    private ItemComponent<DefaultAddress> addressItem;
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await _tokenCache.GetCachedTokenAsync();
+        var result = await _shopifyEndpoint.GetCustomer(token);
+        customer = result.Customer;
+    }
+
+    private void OpenEditAccount()
+    {
+        customerItem.ItemToEdit = customer;
+    }
+    private async Task EditAccount()
+    {
+        var token = await _tokenCache.GetCachedTokenAsync();
+        var newCustomer = await _shopifyEndpoint.UpdateCustomer(customer, token);
+        if (newCustomer.CustomerUpdate.Customer is not null)
+            customer = newCustomer.CustomerUpdate.Customer;
+        else if (newCustomer.CustomerUpdate.CustomerUserErrors is not null)
+                _errorListStore.AddError(new()
+                    {
+                        Message = newCustomer.CustomerUpdate.CustomerUserErrors.First().Message,
+                        State = ErrorState.Danger
+                    });
+            addressItem.ItemToEdit = null;
+        addressItem.ItemToEdit = null;
+    }
+    private void OpenEditAddress()
+    {
+        addressItem.ItemToEdit = customer.DefaultAddress;
+    }
+    private async Task EditAddress()
+    {
+        var token = await _tokenCache.GetCachedTokenAsync();
+        if (customer.DefaultAddress.Id is null)
+        {
+            var newAddress = await _shopifyEndpoint.CreateCustomerAddress(customer, token);
+            if (newAddress.CustomerAddressCreate.CustomerUserErrors.Any() == false)
+                customer.DefaultAddress = newAddress.CustomerAddressCreate.CustomerAddress;
+            else if (newAddress.CustomerAddressCreate.CustomerUserErrors.Any() == true)
+                _errorListStore.AddError(new()
+                    {
+                        Message = newAddress.CustomerAddressCreate.CustomerUserErrors.First().Message,
+                        State = ErrorState.Danger
+                    });
+            addressItem.ItemToEdit = null;
+        }
+        else if (customer.DefaultAddress.Id is not null)
+        {
+            var newAddress = await _shopifyEndpoint.UpdateCustomerAddress(customer, token);
+            if (newAddress.CustomerAddressUpdate.CustomerUserErrors.Any() == false)
+                customer.DefaultAddress = newAddress.CustomerAddressUpdate.CustomerAddress;
+            else if (newAddress.CustomerAddressUpdate.CustomerUserErrors.Any() == true)
+                _errorListStore.AddError(new()
+                    {
+                        Message = newAddress.CustomerAddressUpdate.CustomerUserErrors.First().Message,
+                        State = ErrorState.Danger
+                    });
+            addressItem.ItemToEdit = null;
+        }
+        
+    }
+}

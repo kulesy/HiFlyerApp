@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <GraphQL Remove="GraphQLAPIClient\CreateCheckoutLoggedOut.graphql" />
+    <GraphQL Remove="GraphQLAPIClient\UpdateCustomer.graphql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="GraphQLAPIClient\CreateCheckoutLoggedIn.graphql" />
+    <None Remove="GraphQLAPIClient\CreateCheckoutLoggedOut.graphql" />
+    <None Remove="GraphQLAPIClient\GetProductByHandle.graphql" />
+    <None Remove="GraphQLAPIClient\GetProducts.graphql" />
+    <None Remove="GraphQLAPIClient\UpdateCustomer.graphql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="GraphQLAPIClient\CreateCheckoutLoggedOut.graphql">
+      <GraphQL>true</GraphQL>
+    </AdditionalFiles>
+    <AdditionalFiles Include="GraphQLAPIClient\UpdateCustomer.graphql">
+      <GraphQL>true</GraphQL>
+    </AdditionalFiles>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="11.0.1" />
+    <PackageReference Include="Blazored.LocalStorage" Version="4.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="StrawberryShake.CodeGeneration.CSharp.Analyzers" Version="12.7.0" />
+    <PackageReference Include="StrawberryShake.Transport.Http" Version="12.7.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
+  </ItemGroup>
+
+</Project>

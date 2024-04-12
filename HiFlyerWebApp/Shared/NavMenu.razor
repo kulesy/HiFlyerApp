@@ -1,0 +1,96 @@
+﻿@inject IJSRuntime JS
+@inject IAuthenticationService _authService
+@inject AuthenticationStateProvider _authenticationStateProvider
+@inject NavigationManager _navManager
+
+<div class="navigation" @ref="navigation">
+    <ul class="navigation__list-left">
+        @if (isAuthenticated is true)
+        {
+            <div class="dropdown">
+                <li data-bs-toggle="dropdown" aria-expanded="false" class="navigation__list-item">
+                    <a class="navigation__list-item__text">Account</a>
+                </li>
+                <ul class="hifly-dropdown-menu dropdown-menu">
+                    <li>
+                        <div class="hifly-dropdown-menu__item" @onclick='() => _navManager.NavigateTo("account")'>
+                            <div class="hifly-dropdown-menu__item__icon">
+                                <ion-icon name="person-outline"></ion-icon>
+                            </div>
+                            <div class="hifly-dropdown-menu__item__body">
+                                <h1 class="hifly-dropdown-menu__item__body__heading">Account</h1>
+                                <h3 class="hifly-dropdown-menu__item__body__sub-heading">Find your personal preferences</h3>
+                            </div>
+                        </div>
+                        <div class="hifly-dropdown-menu__item" @onclick='Logout'>
+                            <div class="hifly-dropdown-menu__item__icon">
+                                <ion-icon name="log-out-outline"></ion-icon>
+                            </div>
+                            <div class="hifly-dropdown-menu__item__body">
+                                <h1 class="hifly-dropdown-menu__item__body__heading">Logout</h1>
+                                <h3 class="hifly-dropdown-menu__item__body__sub-heading">Exit out of your account</h3>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        }
+        @if (isAuthenticated is false)
+        {
+            <li class="navigation__list-item">
+                <NavLink href="login" Match="NavLinkMatch.All">Login</NavLink>
+            </li>
+        }
+        <li class="navigation__list-item">
+            <NavLink href="product" Match="NavLinkMatch.All">Browse</NavLink>
+        </li>
+    </ul>
+    <div class="navigation__logo" @onclick='() => _navManager.NavigateTo("/")'>
+        <img src="../images/hiflyer-white.png" class="logo-image" />
+    </div>
+    <ul class="navigation__list-right">
+        <li class="navigation__list-item" @onclick="() => throw new Exception()">
+            <NavLink href="" Match="NavLinkMatch.All">About</NavLink>
+        </li>
+        <li class="navigation__list-item">
+            <NavLink href="" Match="NavLinkMatch.All">Contact</NavLink>
+        </li>
+    </ul>
+    <button class="navigation__menu" @onclick="MenuToggle">
+        <ion-icon name="menu-outline"></ion-icon>
+    </button>
+    <div class="navigation__cart" @onclick="() => ToggleCart(true)">
+                <ion-icon name="cart-outline"></ion-icon>
+    </div>
+</div>
+<Cart></Cart>
+
+@code {
+    bool toggleOn = false;
+    public bool? isAuthenticated = null;
+    ElementReference navigation;
+    ElementReference cart;
+
+    protected async override Task OnInitializedAsync()
+    {
+        var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity.IsAuthenticated;
+    }
+
+    private async Task Logout()
+    {
+        await _authService.Logout();
+        _navManager.NavigateTo("login");
+    }
+
+    private async Task MenuToggle()
+    {
+        toggleOn = !toggleOn;
+        await JS.InvokeAsync<string>("menuToggle", toggleOn, navigation);
+    }
+
+    private async Task ToggleCart(bool isOn)
+    {
+        await JS.InvokeAsync<string>("cartToggle", isOn);
+    }
+}

@@ -1,0 +1,12 @@
+﻿mutation CreateCheckoutLoggedIn($email: String, $lineItems: [CheckoutLineItemInput!], $shippingAddress: MailingAddressInput) {
+  checkoutCreate(input: { email: $email, lineItems: $lineItems, shippingAddress: $shippingAddress }) {
+    checkout {
+      id
+      webUrl
+    }
+    checkoutUserErrors {
+      field
+      message
+    }
+  }
+}

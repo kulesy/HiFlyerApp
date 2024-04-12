@@ -1,0 +1,154 @@
+.navigation {
+    display: grid;
+    color: white;
+    justify-content: center;
+    align-items: center;
+    grid-template-areas: '. nav-left logo nav-right cart';
+    grid-template-columns: 5em 1fr 10em 1fr 5em;
+    grid-template-rows: 1fr;
+    width: 100%;
+}
+
+.navigation__list-left{
+    grid-area: nav-left;
+    justify-content: end;
+    z-index: 1;
+}
+
+.navigation__list-right {
+    grid-area: nav-right;
+    justify-content: start;
+}
+
+.navigation__list-left, .navigation__list-right {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    transform: scale(1, 1);
+}
+
+
+
+.navigation__logo {
+    cursor: pointer;
+    grid-area: logo;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--main-color);
+}
+
+.navigation__logo-image {
+    width: 7em;
+}
+
+.navigation__list-item {
+    padding: 0em 2em;
+}
+.navigation__list-item__text {
+    cursor: pointer;
+}
+
+.navigation__menu {
+    display: none;
+    grid-area: menu;
+    color: white;
+    font-size: 3em;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    background: var(--main-color);
+}
+
+.hifly-dropdown-menu {
+    position: absolute;
+    z-index: 1000;
+    display: none;
+    margin: 0;
+    font-size: 1rem;
+    color: #212529;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0,0,0,.15);
+    width: 15em;
+    justify-content: center;
+}
+
+    .hifly-dropdown-menu.show {
+        display: block;
+    }
+
+.hifly-dropdown-menu__item {
+    display: grid;
+    align-items: center;
+    padding: .5em;
+    cursor: pointer;
+    justify-content: center;
+    grid-template-columns: 2em 1fr;
+}
+
+.hifly-dropdown-menu__item__icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.25em;
+}
+
+.hifly-dropdown-menu__item__body {
+    margin-left: .75em;
+}
+
+.navigation__cart {
+    grid-area: cart;
+    display: flex;
+    justify-content: center;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+
+
+@media screen and (max-width: 641px)
+{
+    .navigation {
+        grid-template-areas: 'logo menu menu cart' 'nav-left nav-left nav-right nav-right';
+        grid-template-columns: repeat(4, 1fr);
+        position: relative;
+    }
+
+    .navigation__menu {
+        display: flex;
+    }
+
+    .navigation__list-left, .navigation__list-right {
+        position: absolute;
+        display: none;
+        flex-direction: column;
+        padding-bottom: 1em;
+        top: 0;
+        background: black;
+        transform: scale(1, 0);
+        transform-origin: top;
+        color: black;
+        transition: transform ease-in-out .4s, color ease-in-out .2s;
+    }
+
+    .navigation__cart {
+        grid-area: cart;
+        display: flex;
+    }
+
+    .nav-visible {
+        display: flex;
+    }
+
+    .nav-slide {
+        transform: scale(1, 1);
+        color: white;
+        transition: transform ease-in-out .4s, color ease-in-out .8s !important;
+    }
+
+}

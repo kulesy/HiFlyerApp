@@ -1,0 +1,27 @@
+﻿@typeparam IType
+
+
+
+@if (this.ItemToEdit == null || Item.GetHashCode() != ItemToEdit.GetHashCode())
+{
+    @Row(Item)
+}
+else
+{
+    @EditTemplate(ItemToEdit)
+}
+
+
+
+
+
+@code {
+    [Parameter]
+    public RenderFragment<IType> Row { get; set; }
+    [Parameter]
+    public IType Item { get; set; }
+    [Parameter]
+    public RenderFragment<IType> EditTemplate { get; set; }
+    public IType ItemToEdit { get; set; }
+
+}

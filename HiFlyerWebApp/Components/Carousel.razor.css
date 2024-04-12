@@ -1,0 +1,115 @@
+﻿.hifly-carousel {
+    height: 30em;
+    position: relative;
+    background-image: conic-gradient(black 0deg, black 90deg, white 90deg, white 180deg, white 180deg, white 270deg, black 270deg, black 360deg);
+    display: flex;
+    justify-content: center;
+}
+
+.carousel__track {
+    height: 100%;
+    overflow: hidden;
+    background: white;
+    width: 80em;
+    position: relative;
+}
+
+.carousel__track-container {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.carousel__track-slide {
+    position: relative;
+    display: none;
+    float: left;
+    width: 100%;
+    margin-right: -100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transition: transform .6s ease-in-out;
+    height: 100%;
+}
+
+.carousel__track-slide__image {
+    height: 100%;
+    width: 100%;
+    object-fit: fill;
+}
+
+.carousel__navigation {
+    position: absolute;
+    bottom: .5em;
+    right: .5em;
+    display: flex;
+    font-size: 2em;
+    z-index: 1;
+}
+
+.carousel__navigation-prev, .carousel__navigation-next {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: black;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 24px;
+}
+
+    .carousel__navigation-prev:hover, .carousel__navigation-prev:focus,
+    .carousel__navigation-next:hover, .carousel__navigation-next:focus {
+        color: white;
+    }
+
+.carousel__navigation-indicators {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.carousel__navigation-indicators__button {
+    width: 15px;
+    height: 15px;
+    border: 1px solid black;
+    margin: .25em;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    cursor: pointer;
+    background-color: transparent;
+}
+
+    .carousel__navigation-indicators__button:hover, .carousel__navigation-indicators__button:focus {
+        background: white;
+    }
+
+.slide-next, .slide-prev, .slide-current {
+    display: block;
+}
+
+.slide-start {
+    transform: translateX(-100%);
+}
+
+.slide-end {
+    transform: translateX(100%);
+}
+
+.indicator-current {
+    background: white;
+}
+
+@media screen and (max-width: 1024px)
+{
+    .hifly-carousel {
+        font-size: .6em;
+    }
+}
+
+@media screen and (max-width: 641px) {
+    .hifly-carousel {
+        font-size: .4em;
+    }
+}

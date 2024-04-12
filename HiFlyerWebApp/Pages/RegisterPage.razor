@@ -1,0 +1,139 @@
+﻿@page "/register"
+@inject IJSRuntime JS
+@inject NavigationManager _navManager
+@inject IShopifyEndpoint _shopifyEndpoint
+@inject ErrorListStore _errorListStore
+@inject AuthenticationStateProvider _authenticationStateProvider
+
+<div class="register">
+    <section class="register-left" id="registerLeft" @ref="registerLeft">
+        <div class="register-left__container">
+            <div class="register-left__body" id="registerLeftBody">
+                <div class="register-left__top-bar">
+                    <div class="register-left__go-back" @onclick="NavigateToHome">
+                        <ion-icon name="arrow-back-outline"></ion-icon>
+                        <p class="register-left__go-back-text">Home</p>
+                    </div>
+                    <div class="register-left__logo">
+                        <img src="../images/hiflyer-black.png" class="logo-image"/>
+                    </div>
+                    <div class="register-left__login" @onclick="LoginExecuteAsync">
+                        <p class="register-left__login-text">Login</p>
+                        <ion-icon name="log-in"></ion-icon>
+                    </div>
+                </div>
+                <h1 class="register-left__heading">Register</h1>
+                <h3 class="register-left__sub-heading">Your Account</h3>
+                <EditForm Model="registerModel" OnValidSubmit="RegisterExecuteAsync">
+                    <DataAnnotationsValidator />
+                    <div class="register-left__form">
+                        <div class="hifly-input-group">
+                            <div class="hifly-form-group">
+                            <label for="firstName" class="visually-hidden">First Name</label>
+                            <InputText id="firstName" class="form-control hifly-input" 
+                            @bind-Value="registerModel.FirstName" placeholder="First Name"/>
+                            </div>
+                            <div class="hifly-form-group">
+                                <label for="lastName" class="visually-hidden">Last Name</label>
+                                <InputText id="lastName" class="form-control hifly-input" 
+                                @bind-Value="registerModel.LastName" placeholder="Last Name"/>
+                            </div>
+                        </div>
+                    
+                        <div class="hifly-form-group">
+                            <label for="email" class="visually-hidden">Email</label>
+                            <InputText id="email" class="form-control hifly-input" type="email" 
+                            @bind-Value="registerModel.Email" placeholder="Email"/>
+                        </div>
+                        <div class="hifly-input-group">
+                            <div class="hifly-form-group">
+                                <label for="password" class="visually-hidden">Password</label>
+                                <InputText id="password" class="form-control hifly-input"  type="password" 
+                                @bind-Value="registerModel.Password" placeholder="Password"/>
+                            </div>
+                            <div class="hifly-form-group">
+                                <label for="confirmPassword" class="visually-hidden">Confirm Password</label>
+                                <InputText id="confirmPassword" class="form-control hifly-input" type="password" 
+                                @bind-Value="registerModel.ConfirmPassword" placeholder="Confirm Password"/>
+                            </div>
+                        </div>
+                        <div class="hifly-form-checkbox">
+                            <label for="acceptsMarketing" class="visually-hidden">Accepts Marketing</label>
+                            <InputCheckbox id="acceptsMarketing" @bind-Value="registerModel.AcceptsMarketing" />
+                            <p class="hifly-checkbox-text"><a href="">I want to recieve updates on the latest releases</a></p>
+                        </div>
+                        <div class="hifly-form-checkbox">
+                            <label for="acceptsTerms" class="visually-hidden">Accepts Terms and Conditions</label>
+                            <InputCheckbox @bind-Value="registerModel.AcceptsTerms" />
+                            <p class="hifly-checkbox-text"><a href="">I have read the Terms & Conditions</a></p>
+                        </div>
+                        <ValidationMessage For="@(() => registerModel.AcceptsTerms)" class="mt-2" />
+                        <div class="hifly-form__button">
+                            <button type="submit" class="hifly-secondary-button btn"><h2 class="hifly-secondary-button__text">Register</h2></button>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </section>
+    <section class="register-right" id="registerRight" @ref="registerRight">
+        <div class="register-right__body" id="registerRightBody">
+            <div class="register-right__go-back" @onclick="NavigateToHome">
+                        <ion-icon name="arrow-forward-outline"></ion-icon>
+            </div>
+            <h1 class="register-right__heading">Already Have a <br /> HiFlyer Account?</h1>
+            <h3 class="register-right__sub-heading">Login with your HiFlyer account to gain access to your personal information.</h3>
+            <button type="submit" 
+                    class="hifly-primary-button btn"
+                    @onclick="LoginExecuteAsync"><h2>Login</h2></button>
+        </div>
+    </section>
+</div>
+
+@code {
+    ElementReference register;
+    ElementReference signUp;
+    ElementReference registerLeft;
+    ElementReference registerRight;
+
+    RegisterModel registerModel = new();
+
+    protected async override Task OnInitializedAsync()
+    {
+        var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        var isAuthenticated = authState.User.Identity.IsAuthenticated;
+        if (isAuthenticated is true)
+            _navManager.NavigateTo("/");
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender == true)
+        {
+            await JS.InvokeAsync<string>("opacityToggle", registerLeft, registerRight);
+        }
+    }
+    private async Task RegisterExecuteAsync()
+    {
+        Console.WriteLine(registerModel.FirstName);
+        var result = await _shopifyEndpoint.CreateCustomer(registerModel);
+        if (result != null)
+            await LoginExecuteAsync();
+        else if (result == null)
+            _errorListStore.AddError(new() {
+                    Message = "Register failed. Please try again.",
+                    State = ErrorState.Danger });
+    }
+
+    private async Task LoginExecuteAsync()
+    {
+        await JS.InvokeAsync<string>("switchFormFocus", registerLeft, registerRight);
+        await Task.Delay(400);
+        _navManager.NavigateTo("login");
+    }
+
+    private void NavigateToHome()
+    {
+        _navManager.NavigateTo("");
+    }
+}

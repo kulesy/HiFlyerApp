@@ -1,0 +1,42 @@
+﻿.account {
+    height: calc(100vh - 6rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.account__body {
+    display: flex;
+    flex-direction: column;
+    font-size: 1.5em;
+    max-width: 50em;
+    width: 100%;
+    padding: 0em 1em;
+}
+.account__body__heading {
+    padding: 1em 0em .5em;
+    border-bottom: 1px solid lightgray;
+    display: flex;
+    justify-content: space-between;
+}
+
+.account__body__info {
+    padding: .75em 0em;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1em;
+}
+
+.account__body__info__tab {
+}
+
+.account__body__info__tab__heading {
+    font-weight: 500;
+}
+
+.account__body__info__tab__text {
+    font-weight: 400;
+}
+
+.account__body__heading__manage {
+    cursor: pointer;
+}

@@ -1,0 +1,20 @@
+﻿<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly" PreferExactMatches="@true">
+        <Found Context="routeData">
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" >
+                    <Authorizing>
+                        <div class="spinner">
+                            <div class="spinner-border text-dark" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </Authorizing>
+                </AuthorizeRouteView>
+        </Found>
+        <NotFound>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <p>Sorry, there's nothing at this address.</p>
+                </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

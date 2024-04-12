@@ -1,0 +1,218 @@
+﻿.product {
+    display: flex;
+}
+
+.product-content {
+    width: 40vw;
+    font-size: 2em;
+}
+
+.product-body {
+    margin-left: 1.5em;
+    padding: 1em;
+    background: var(--main-color);
+    color: var(--secondary-color);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.product-body__header {
+    padding: 1em 0em .5em;
+}
+
+.product-body__stock {
+    padding-top: .5em;
+}
+
+.product-body__stock__text {
+    display: inline-block;
+    padding: .25em;
+    border: 1px solid white;
+}
+
+.product-sizing {
+    padding: .5em 0em;
+}
+
+.product-sizing__tab-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: .5em;
+}
+
+.product-sizing__header {
+    margin-bottom: .5em;
+}
+
+.product-sizing__tab {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--secondary-color);
+    padding: .5em 0em;
+    cursor: pointer;
+    gap: .5em;
+    color: white;
+}
+    .product-sizing__tab:hover, .product-sizing__tab:focus {
+        background: var(--secondary-color);
+        color: var(--main-color);
+    }
+
+.product-sizing__tab-text {
+    font-size: .5em;
+}
+
+.size-selected {
+    background: var(--secondary-color);
+    color: var(--main-color);
+}
+
+.product-quantity {
+    display: flex;
+    padding: .5em 0;
+    align-items: center;
+}
+
+.product-quantity__text {
+    margin-right: .75em;
+}
+
+
+
+
+.product-body__button {
+    cursor: pointer;
+    padding: .5em 0em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--secondary-color);
+}
+
+    .product-body__button:hover, .product-body__button:focus {
+        background: var(--secondary-color);
+        color: var(--main-color);
+    }
+
+.product-body__description {
+    padding: .5em 0em;
+}
+
+.product-body__description-heading {
+    margin: .25em 0;
+    border-bottom: 1px solid var(--secondary-color);
+    padding: .25em 0;
+}
+
+.product-gallery {
+    width: 60vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 6rem);
+    position: sticky;
+    top: 10vh;
+    bottom: 0;
+    right: 0;
+}
+
+.product-gallery__container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.product-gallery__viewer {
+    width: 30em;
+    height: 30em;
+}
+
+.product-gallery__viewer-image {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+}
+
+.product-gallery__navigation {
+    display: flex;
+    justify-content: center;
+}
+
+.product-gallery__navigation-left, .product-gallery__navigation-right {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+    .product-gallery__navigation-left:hover, .product-gallery__navigation-left:focus,
+    .product-gallery__navigation-right:hover, .product-gallery__navigation-right:focus {
+        color: grey;
+    }
+.product-gallery__navigation-thumbs {
+    width: 28em;
+    overflow: hidden;
+}
+
+.product-gallery__navigation-thumbs__track {
+    width: auto;
+    display: inline-flex;
+}
+
+.product-gallery__navigation-thumbs__track__slide {
+    width: 7em;
+    height: 7em;
+}
+
+    .product-gallery__navigation-thumbs__track__slide:hover, .product-gallery__navigation-thumbs__track__slide:focus {
+        background: rgba(0,0,0, 0.1)
+    }
+
+.product-gallery__navigation-thumbs__track__slide__image {
+    height: 100%;
+    object-fit: contain;
+    width: 100%;
+}
+
+.slide-main {
+    background: rgba(0,0,0, 0.3)
+}
+
+.product-sizing__tab[disabled] {
+    cursor: default;
+    opacity: .5;
+}
+
+.product-sizing__tab[disabled]:hover, .product-sizing__tab[disabled]:focus {
+    background: black;
+    color: white;
+}
+
+    @media screen and (max-width: 1024px) {
+        .product {
+            flex-direction: column-reverse;
+        }
+
+        .product-content {
+            width: 100%;
+            z-index: 1;
+        }
+
+            .product-body {
+                margin: 0;
+            }
+
+        .product-gallery {
+            width: 100%;
+            z-index: 0;
+        }
+    }
+
+@media screen and (max-width: 641px) {
+    .product {
+        font-size: .7em;
+    }
+}

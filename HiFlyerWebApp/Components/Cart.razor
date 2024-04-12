@@ -1,0 +1,197 @@
+﻿@inject IJSRuntime JS
+@inject ICartCache _cartCache
+@inject ITokenCache _tokenCache
+@inject IShopifyEndpoint _shopifyEndpoint
+@inject ErrorListStore _errorListStore
+@inject NavigationManager _navManager
+@implements IDisposable
+
+<div class="cart-main" id="cart">
+    <div class="cart">
+        <div class="cart__body">
+            <div class="cart__body__header">
+                <h1 class="cart__body__heading">Your Cart</h1>
+                @if (cart is null || cart.Count == 0)
+                {
+                    <p class="cart__body__sub-heading">Cart is currently empty</p>
+                }
+            </div>
+            <div class="corner-element" @onclick="() => ToggleCart(false)">
+                <ion-icon name="close"></ion-icon>
+            </div>
+            @if (cart is not null && cart.Count > 0)
+            {
+            <div class="cart__body__item-container">
+                    @foreach(var product in cart)
+                    {
+                        <div class="cart__body__item-container__item">
+                            <img class="cart__body__item-container__item__image" src="@product.ImageUrl"/>
+                            <div class="cart__body__item-container__item__body">
+                                <h3 class="cart__body__item-container__item__title">@product.Title</h3>
+                                <p class="cart__body__item-container__item__type">US @product.VariantTitle</p>
+                                <div class="cart__body__item-container__item__quantity">
+                                    <h3 class="cart__body__item-container__item__quantity__text">Quantity</h3>
+                                    <input type="number" class="hifly-number-input-secondary" @bind-value="product.Quantity">
+                                    <div class="hifly-number-input-secondary__button-group">
+                                        <div class="hifly-number-input-secondary__button-group__button-up" @onclick="async () => await IncrementQuantity(product)">
+                                            <ion-icon name="caret-up" class="cart-icon"></ion-icon>
+                                        </div>
+                                        <div class="hifly-number-input-secondary__button-group__button-down" @onclick="async () => await DecrementQuantity(product)">
+                                            <ion-icon name="caret-down" class="cart-icon">></ion-icon>
+                                        </div>
+                                    </div>
+                                    <div class="cart__body__item-container__item__quantity__remove" @onclick="async () => await RemoveFromCart(product)">
+                                            <ion-icon name="trash-outline" class="cart-icon"></ion-icon>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    }
+                    
+            </div>
+            <div class="cart__body__total">
+                <h2 class="cart__body__total__heading">Total:</h2>
+                <h2 class="cart__body__total__heading">@GetTotal()</h2>
+            </div>
+            <div class="cart__body__checkout">
+                <div class="btn hifly-primary-button" @onclick="CheckoutExecuteAsync">
+                    <h2>Proceed To Checkout</h2>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<CartProduct> cart;
+
+    protected async override Task OnInitializedAsync()
+    {
+        DateTime? cacheDate = await _cartCache.GetCachedDateAsync();
+        double timeTaken = 0;
+
+        if (cacheDate is not null)
+        {
+            timeTaken = DateTime.UtcNow.Subtract((DateTime)cacheDate).TotalMinutes;
+            if (timeTaken >= 1)
+            {
+                cart = null;
+                await _cartCache.DeleteCacheAsync();
+            }
+            else
+            {
+                cart = await _cartCache.GetCachedCartAsync();
+            }
+        }
+        _cartCache.AddStateChangeListeners(async () => {
+            cart = await _cartCache.GetCachedCartAsync();
+            await ToggleCart(true);
+            StateHasChanged(); 
+        });
+    }
+
+    private async Task ToggleCart(bool isOn)
+    {
+        await JS.InvokeAsync<string>("cartToggle", isOn);
+    }
+
+    private async Task IncrementQuantity(CartProduct product)
+    {
+        if (product.Quantity == product.MaxQuantity)
+            _errorListStore.AddError(new() { Message = "Stock limit reached.", State = ErrorState.Warning });
+        else if(product.Quantity < product.MaxQuantity)
+        {
+            product.Quantity += 1;
+            await _cartCache.CreateCacheAsync(cart);
+        }    
+        
+    }
+
+    private async Task DecrementQuantity(CartProduct product)
+    {
+        if (product.Quantity == 1)
+            await _cartCache.DeleteProductFromCacheAsync(product);
+        else if(product.Quantity > 0)
+        {
+            product.Quantity -= 1;
+            await _cartCache.CreateCacheAsync(cart);
+        }    
+    }
+
+    private string GetTotal()
+    {
+        decimal total = 0;
+        if (cart is null || cart.Count == 0)
+            return total.ToString("C2", CultureInfo.CreateSpecificCulture("en-US"));
+        foreach(var product in cart)
+        {
+            total += (Convert.ToDecimal(product.Price) * product.Quantity);
+        }
+        return total.ToString("C2", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+
+    private async Task RemoveFromCart(CartProduct product)
+    {
+        await _cartCache.DeleteProductFromCacheAsync(product);
+    }
+
+    private async Task CheckoutExecuteAsync()
+    {
+        if (cart is not null)
+        {
+            var token = await _tokenCache.GetCachedTokenAsync();
+            string checkoutUrl = _navManager.BaseUri;
+            if (token is not null)
+            {
+                var customerResult = await _shopifyEndpoint.GetCustomer(token);
+                var customer = customerResult.Customer;
+                var checkoutResult = await _shopifyEndpoint.CreateCheckoutLoggedIn(cart, customer);
+                if (checkoutResult.CheckoutCreate.CheckoutUserErrors.Any() == false)
+                {
+                    var checkoutAssociateResult = await _shopifyEndpoint.CheckoutCustomerAssociate(checkoutResult.CheckoutCreate.Checkout.Id, token);
+                    checkoutUrl = checkoutAssociateResult.CheckoutCustomerAssociateV2.Checkout.WebUrl.ToString();
+                }
+                else if(checkoutResult.CheckoutCreate.CheckoutUserErrors.Any() == true)
+                {
+                    _errorListStore.AddError(new()
+                        {
+                            Message = checkoutResult.CheckoutCreate.CheckoutUserErrors.First().Message,
+                            State = ErrorState.Danger
+                        });
+                }
+            }
+            else
+            {
+                var checkoutResult = await _shopifyEndpoint.CreateCheckoutLoggedOut(cart);
+                if (checkoutResult.CheckoutCreate.CheckoutUserErrors.Any() == false)
+                {
+                    checkoutUrl = checkoutResult.CheckoutCreate.Checkout.WebUrl.ToString();
+                }
+                else if (checkoutResult.CheckoutCreate.CheckoutUserErrors.Any() == true)
+                {
+                    _errorListStore.AddError(new()
+                        {
+                            Message = checkoutResult.CheckoutCreate.CheckoutUserErrors.First().Message,
+                            State = ErrorState.Danger
+                        });
+                }
+            }
+            _navManager.NavigateTo(checkoutUrl);
+        }
+
+    }
+
+    public void UpdateView()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _cartCache.RemoveStateChangeListeners(UpdateView);
+    }
+
+
+}

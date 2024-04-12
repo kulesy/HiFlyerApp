@@ -1,0 +1,19 @@
+.header {
+    background-color: black;
+    position: sticky;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 2;
+    height: 6rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer {
+    background-color: black;
+    display: flex;
+    color: white;
+    height: 6rem;
+}

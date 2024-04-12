@@ -1,0 +1,182 @@
+﻿
+.login {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    background: white;
+    height: 100vh;
+    width: 100%;
+    background-image: url(../images/hiflyer-login-background.png);
+    z-index: 3;
+}
+
+.login-left {
+    width: 30vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--secondary-color);
+    transition: transform 0.4s ease-in-out;
+}
+
+.login-left__body {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 2em;
+    width: 10em;
+    text-align: center;
+    margin-bottom: 1em;
+    opacity: 0;
+}
+
+.login-left__go-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 1.5em;
+    padding: .5em 1em;
+    cursor: pointer;
+}
+
+.login-left__heading {
+    font-size: 1.2em;
+}
+
+.login-left__sub-heading {
+    margin: 1em;
+    font-weight: 300;
+}
+
+.login-right {
+    width: 70vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.4s ease-in-out;
+}
+
+.login-right__container {
+    background: white;
+    width: 40em;
+    height: 50em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+}
+
+.login-right__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.login-right__top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    
+}
+
+.login-right__go-back {
+    display: none;
+    width: 100%;
+    padding-left: 1em;
+    font-size: 2em;
+    justify-content: start;
+    align-items: center;
+    cursor: pointer;
+}
+
+    .login-right__go-back-text {
+        padding-left: 1em;
+    }
+
+    .login-right__logo {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+.login-right__register {
+    cursor: pointer;
+    display: none;
+    width: 100%;
+    justify-content: end;
+    padding-right: 1em;
+    font-size: 2em;
+}
+
+.login-right__register-text {
+    padding-right: 1em;
+}
+
+.login-right__register:hover, .login-right__register:focus,
+.login-right__go-back:hover, .login-right__go-back:focus {
+    color: var(--accent-color);
+}
+
+.login-right__heading {
+    font-size: 2.4em;
+    margin-top: 4em;
+}
+
+.login-right__sub-heading {
+    font-size: 1.2em;
+    margin-top: .75em;
+    font-weight: 300;
+}
+
+.login-right__form {
+    width: 15em;
+    font-size: 1.6em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hifly-form__button {
+    font-size: 1.2em;
+}
+
+.hifly-form__forgot-password {
+    margin: .8em;
+    text-decoration: underline;
+}
+
+@media screen and (max-width: 1024px)  {
+    .login {
+        font-size: 0.8em;
+    }
+}
+
+@media screen and (max-width: 641px) {
+    .login {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .login-right {
+        width: 100%;
+    }
+
+    .login-left {
+        display: none;
+    }
+
+    .login-right__go-back {
+        display: flex;
+    }
+
+    .login-right__register {
+        display: flex;
+    }
+}

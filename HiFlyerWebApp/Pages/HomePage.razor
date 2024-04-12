@@ -1,0 +1,46 @@
+﻿@page "/"
+@inject IShopifyEndpoint _shopifyEndpoint
+@inject NavigationManager _navManager
+<Carousel></Carousel>
+
+<div class="collection">
+    <div class="collection__heading">    
+        <h3 class="collection__heading-text">Our Selection</h3>
+    </div>
+    <div class="collection__content">
+        @if (products is not null)
+        {
+            @foreach (var product in products.Products.Edges)
+            {
+                <div class="collection__item" @onclick="() => NavigateToProductPage(product.Node.Handle)">
+                    <img class="collection__item-image" src="@product.Node.Images.Edges[0].Node.Url" 
+                    onerror='this.onerror = null; this.src="../images/hiflyer-grey.png"'
+                    alt="@product.Node.Title"/>
+                    <h2 class="collection-__item-name">@product.Node.Title</h2>
+                    <h1 class="collection-__item-price">@Convert.ToDecimal(product.Node.PriceRange.MinVariantPrice.Amount).ToString("C2", CultureInfo.CreateSpecificCulture("en-US"))</h1>
+                </div>
+            }
+        }
+        else if (products is null)
+        {
+            @for(var i = 0; i < 4; i++)
+            {
+                <div class="collection__item">
+                    <img class="collection__item-image" src="../images/hiflyer-grey.png"/>
+                </div>
+            }
+        }
+    </div>
+</div>
+@code {
+    GetProductsResponse products;
+    protected async override Task OnInitializedAsync()
+    {
+        products = await _shopifyEndpoint.GetProducts();
+    }
+
+    private void NavigateToProductPage(string handle)
+    {
+        _navManager.NavigateTo($"product/{handle}");
+    }
+}

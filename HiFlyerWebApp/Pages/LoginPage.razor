@@ -1,0 +1,106 @@
+﻿@page "/login"
+@inject IJSRuntime JS
+@inject NavigationManager _navManager
+@inject IAuthenticationService _authService
+@inject ErrorListStore _errorListStore
+@inject AuthenticationStateProvider _authenticationStateProvider
+
+<div class="login">
+    <section class="login-left" @ref="loginLeft">
+        <div class="login-left__body">
+            <div class="login-left__go-back" @onclick="NavigateToHome">
+                <ion-icon name="arrow-back-outline"></ion-icon>
+            </div>
+            <h1 class="login-left__heading">Welcome to <br /> HiFlyer!</h1>
+            <h3 class="login-left__sub-heading">Sign up with us to stay up to date with the newest releases.</h3>
+            <button type="submit" 
+                    class="hifly-primary-button btn"
+                    @onclick="RegisterExecuteAsync"><h2>Register</h2></button>
+        </div>
+    </section>
+    <section class="login-right" @ref="loginRight">
+        <div class="login-right__container">
+            <div class="login-right__body">
+                <div class="login-right__top-bar">
+                    <div class="login-right__go-back" @onclick="NavigateToHome">
+                        <ion-icon name="arrow-back-outline"></ion-icon>
+                        <p class="login-right__go-back-text">Home</p>
+                    </div>
+                    <div class="login-right__logo">
+                        <img src="../images/hiflyer-black.png" class="logo-image"/>
+                    </div>
+                    <div class="login-right__register" @onclick="RegisterExecuteAsync">
+                        <p class="login-right__register-text">Register</p>
+                        <ion-icon name="log-in"></ion-icon>
+                    </div>
+                </div>
+                <h1 class="login-right__heading">Login</h1>
+                <h3 class="login-right__sub-heading">To Your HiFlyer Account</h3>
+                <EditForm Model="loginModel" OnValidSubmit="LoginExecuteAsync">
+                    <DataAnnotationsValidator />
+                    <div class="login-right__form">
+                        <div class="hifly-form-group">
+                            <label for="email" class="visually-hidden">Email</label>
+                            <InputText id="email" class="form-control hifly-input" 
+                            @bind-Value="loginModel.Email" placeholder="Email"/>
+                        </div>
+                        <div class="hifly-form-group">
+                            <label for="password" class="visually-hidden">Password</label>
+                            <InputText type="password" id="password" class="form-control hifly-input"
+                            @bind-Value="loginModel.Password" placeholder="Password" />
+                        </div>
+                        <p class="hifly-form__forgot-password"><a>Forgot your password?</a></p>
+                        <div class="hifly-form__button">
+                            <button type="submit" class="hifly-secondary-button btn"><h2 class="hifly-secondary-button__text">Login</h2></button>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+    ElementReference loginLeft;
+    ElementReference loginRight;
+
+    LoginModel loginModel = new();
+
+    protected async override Task OnInitializedAsync()
+    {
+        var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        var isAuthenticated = authState.User.Identity.IsAuthenticated;
+        if (isAuthenticated is true)
+            _navManager.NavigateTo("/");
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender == true)
+        {
+            await JS.InvokeAsync<string>("opacityToggle", loginLeft, loginRight);
+        }
+    }
+    private async Task LoginExecuteAsync()
+    {
+        var result = await _authService.Login(loginModel);
+        if (result is not null)
+            NavigateToHome();
+        else if (result is null)
+            _errorListStore.AddError(new() {
+                    Message = "Login failed. Please check your email or password.",
+                    State = ErrorState.Danger });
+    }
+
+    private async Task RegisterExecuteAsync()
+    {
+        await JS.InvokeAsync<string>("switchFormFocus", loginLeft, loginRight);
+        await Task.Delay(400);
+        _navManager.NavigateTo("register");
+    }
+
+    private void NavigateToHome()
+    {
+        _navManager.NavigateTo("", forceLoad:true);
+    }
+}

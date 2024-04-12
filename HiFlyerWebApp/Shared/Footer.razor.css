@@ -1,0 +1,10 @@
+﻿.footer__privacy-policy, .footer__logo, .footer__terms-and-conditions {
+    flex: 1 1 33%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer__privacy-policy, .footer__terms-and-conditions {
+    font-size: 1.25em;
+}

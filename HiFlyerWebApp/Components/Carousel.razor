@@ -1,0 +1,65 @@
+﻿@inject IJSRuntime JS
+<div class="hifly-carousel">
+    <div class="carousel__track">
+        <div class="carousel__track-container" @ref="track">
+            <div class="carousel__track-slide slide-current">
+                <img src="../images/hiflyer-carousel-1.png" class="carousel__track-slide__image" alt="...">
+            </div>
+            <div class="carousel__track-slide">
+                <img src="../images/hiflyer-carousel-2.png" class="carousel__track-slide__image" alt="...">
+            </div>
+            <div class="carousel__track-slide">
+                <img src="../images/hiflyer-carousel-3.png" class="carousel__track-slide__image" alt="...">
+            </div>
+            <div class="carousel__track-slide">
+                <img src="../images/hiflyer-carousel-3.png" class="carousel__track-slide__image" alt="...">
+            </div>
+        </div>
+        <div class="carousel__navigation">
+            <button class="carousel__navigation-prev" @onclick="PrevSlide" disabled="@isNavigationDisabled">
+                <ion-icon name="caret-back-outline"></ion-icon>
+            </button>
+            <div class="carousel__navigation-indicators" id="carouselIndicators" @ref="indicators">
+                <button class="carousel__navigation-indicators__button indicator-current" disabled="@isNavigationDisabled" 
+                @onclick="async () => await ToSlide(0)"></button>
+                <button class="carousel__navigation-indicators__button" disabled="@isNavigationDisabled"
+                @onclick="async () => await ToSlide(1)"></button>
+                <button class="carousel__navigation-indicators__button" disabled="@isNavigationDisabled"
+                @onclick="async () => await ToSlide(2)"></button>
+                <button class="carousel__navigation-indicators__button" disabled="@isNavigationDisabled"
+                @onclick="async () => await ToSlide(3)"></button>
+            </div>
+            <button class="carousel__navigation-next" @onclick="NextSlide" disabled="@isNavigationDisabled">
+                <ion-icon name="caret-forward-outline"></ion-icon>
+            </button>
+        </div>
+        </div>
+</div>
+
+@code {
+    ElementReference track;
+    ElementReference indicators;
+
+    bool isNavigationDisabled = false;
+
+    private async Task NextSlide()
+    {
+        isNavigationDisabled = true;
+        await JS.InvokeAsync<string>("moveSlide", track, indicators, "foward");
+        isNavigationDisabled = false;
+    }
+
+    private async Task PrevSlide()
+    {
+        isNavigationDisabled = true;
+        await JS.InvokeAsync<string>("moveSlide", track, indicators, "backward");
+        isNavigationDisabled = false;
+    }
+
+    private async Task ToSlide(int targetIndex)
+    {
+        isNavigationDisabled = true;
+        await JS.InvokeAsync<string>("moveToSlide", track, indicators, targetIndex);
+        isNavigationDisabled = false;
+    }
+}

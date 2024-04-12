@@ -1,0 +1,184 @@
+﻿@page "/product/{Handle}"
+@inject IJSRuntime JS
+@inject IShopifyEndpoint _shopifyEndpoint
+@inject ICartCache _cartCache
+@inject ErrorListStore _errorListStore
+
+    <div class="product">
+        <div class="product-content">
+            <div class="product-body">
+                @if (product is not null)
+                {
+                    <div class="product-body__header">
+                        <h1 class="product-body__header__text">@product.Title</h1>
+                    </div>
+                    <div class="product-body__price">
+                        <h1 class="product-body__price__text">
+                            @Convert.ToDecimal(product.PriceRange.MinVariantPrice.Amount).ToString("C2", CultureInfo.CreateSpecificCulture("en-US"))
+                        </h1>
+                    </div>
+                    <div class="product-body__stock">
+                        @if (IsOutOfStock(selectedSize) == false)
+                        {
+                            <h3 class="product-body__stock__text">
+                                In Stock
+                            </h3>
+                        }
+
+                        else if (IsOutOfStock(selectedSize) == true)
+                        {
+                            <h3 class="product-body__stock__text">
+                                Out Of Stock
+                            </h3>
+                        }
+                    </div>
+                    <div class="product-sizing">
+                        <div class="product-sizing__header">
+                            <h3 class="product-sizing__header-text">Size</h3>
+                        </div>
+                        <div class="product-sizing__tab-container">
+                            @foreach (var size in shoeSizes)
+                            {
+                                <button class="product-sizing__tab @IsSizeSelected(size)" disabled=@IsOutOfStock(size)
+                                    @onclick="() => selectedSize = size"> 
+                                    <p class="product-sizing__tab-text">US @size</p>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                    <div class="product-body__button" @onclick="AddToCart">
+                        <h3 class="product-body__button-text">Add To Cart</h3>
+                    </div>
+
+                    <div class="product-body__description">
+                        <div class="product-body__description-heading">
+                            <h3 class="product-body__description-heading-text">Description</h3>
+                        </div>
+                        <div class="product-body__description-body">
+                            <p class="product-body__description-body-text">
+                                @product.Description 
+                            </p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="product-gallery">
+            <div class="product-gallery__container">
+                @if (product is not null)
+                {
+                    <div class="product-gallery__viewer">
+                        <img class="product-gallery__viewer-image" src="@product.Images.Edges[currentSlideIndex].Node.Url"/>
+                    </div>
+                    <div class="product-gallery__navigation">
+                        <div class="product-gallery__navigation-left" @onclick="SlideBackward">
+                            <ion-icon name="caret-back-outline"></ion-icon>
+                        </div>
+                        <div class="product-gallery__navigation-thumbs">
+                            <div class="product-gallery__navigation-thumbs__track" @ref="track">
+                                @foreach (var image in product.Images.Edges)
+                                {
+                                    <div class="product-gallery__navigation-thumbs__track__slide @IsFirstImage(image)"
+                                    @onclick="async () => await ToggleMainSlide(product.Images.Edges.ToList().IndexOf(image))">
+                                        <img class="product-gallery__navigation-thumbs__track__slide__image" src="@image.Node.Url"/>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="product-gallery__navigation-right" @onclick="SlideForward">
+                            <ion-icon name="caret-forward-outline"></ion-icon>
+                        </div>
+                    </div>
+                }
+                else if (product is null)
+                {
+                    <div class="product-gallery__viewer">
+                        <img class="product-gallery__viewer-image" src="../images/hiflyer-grey.png"/>
+                    </div>
+                }
+        </div>
+        </div>
+    </div>
+
+@code {
+    List<string> shoeSizes = new();
+    string selectedSize;
+    int currentSlideIndex = 0;
+    ElementReference track;
+
+    Product product;
+
+
+    [Parameter]
+    public string Handle { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var result = await _shopifyEndpoint.GetProductByHandle(Handle);
+        product = result.Product;
+        var sizeOption = product.Options.Where(e => e.Name == "Size").FirstOrDefault();
+        if (sizeOption is not null)
+            shoeSizes = sizeOption.Values.ToList();
+        var edge = product.Variants.Edges.Where(e => e.Node.Quantity != "0").FirstOrDefault();
+        if (edge is not null)
+            selectedSize = edge.Node.Title;
+    }
+
+    private void AddToCart()
+    {
+        CartProduct cartProduct = new();
+        var selectedVariant = product.Variants.Edges.Where(e => e.Node.Title == selectedSize).FirstOrDefault();
+        if (selectedVariant is not null && selectedVariant.Node.Quantity != "0")
+        {
+            cartProduct.Title = product.Title;
+            cartProduct.Price = product.PriceRange.MinVariantPrice.Amount;
+            cartProduct.Quantity = 1;
+            cartProduct.VariantId = selectedVariant.Node.Id;
+            cartProduct.VariantTitle = selectedVariant.Node.Title;
+            cartProduct.ImageUrl = product.Images.Edges.FirstOrDefault().Node.Url;
+            cartProduct.MaxQuantity = int.Parse(selectedVariant.Node.Quantity);
+            _cartCache.AddProductToCacheAsync(cartProduct); 
+        }
+        else 
+        {
+            _errorListStore.AddError(new() { Message = "No size selected.", State = ErrorState.Warning });
+        }
+    }
+
+    private async Task SlideBackward()
+    {
+        await JS.InvokeAsync<string>("trackSlide", track, "backward");
+    }
+    private async Task SlideForward()
+    {
+        await JS.InvokeAsync<string>("trackSlide", track, "forward");
+    }
+    private async Task ToggleMainSlide(int targetSlideIndex)
+    {
+        currentSlideIndex = await JS.InvokeAsync<int>("toggleMainSlide", track, targetSlideIndex);
+    }
+
+    private string IsFirstImage(ImagesEdge node)
+    {
+        if (product.Images.Edges.ToList().IndexOf(node) == 0)
+            return "slide-current slide-main";
+        return null;
+    }
+
+    private string IsSizeSelected(string size)
+    {
+        return (size == selectedSize) ? "size-selected" : ""; 
+    }
+
+    private bool IsOutOfStock(string size)
+    {
+        var selectedVariant = product.Variants.Edges.Where(e => e.Node.Title == size).FirstOrDefault();
+        if (selectedVariant is not null)
+        {
+            if (selectedVariant.Node.Quantity == "0")
+                return true;
+            return false;
+        }
+        return true;
+    }
+}
